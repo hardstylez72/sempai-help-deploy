@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  frontend:
+    image: "hardstylez72/back:latest"
+    restart: always
+    #build: ./sempai.help-front
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+  backend:
+    image: "hardstylez72/sempai:latest"
+    restart: always
+   # build: ./sempai.help-back/
+    ports:
+      - 4000:4000
+    env_file:
+      - .env
+    volumes:
+      - ${CONTENT_PATH}:${CONTENT_PATH}
+    depends_on:
+      - redis
+      - postgres
+  redis:
+    image: "redis:4-alpine"
+    ports:
+      - 6379:6379
+    restart: always
+    command: --requirepass ${REDIS_PWD}
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: ${DB_SQL_PWD}
+      POSTGRES_USER: ${DB_SQL_USER}
+      POSTGRES_DB: ${DB_SQL_NAME}
